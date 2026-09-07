@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ===================================================== -->
+    <!-- VUE FORMULAIRE : EXERCICE -->
+    <!-- ===================================================== -->
+
+    <record id="view_commune_exercice_form" model="ir.ui.view">
+        <field name="name">commune.exercice.form</field>
+        <field name="model">commune.exercice</field>
+
+        <field name="arch" type="xml">
+
+            <form string="Exercice budgétaire">
+
+                <!-- ETAT DE L'EXERCICE -->
+                <header>
+
+                    <button
+                        name="action_passer_periode_complementaire"
+                        string="Passer en période complémentaire"
+                        type="object"
+                        invisible="etat != 'ouvert'"
+                    />
+
+                    <button
+                        name="action_cloturer"
+                        string="Clôturer"
+                        type="object"
+                        invisible="etat != 'complementaire'"
+                    />
+
+                    <button
+                        name="action_reouvrir"
+                        string="Réouvrir"
+                        type="object"
+                        invisible="etat != 'cloture'"
+                    />
+
+                    <field
+                        name="etat"
+                        widget="statusbar"
+                        statusbar_visible="ouvert,complementaire,cloture"
+                    />
+
+                </header>
+
+                <sheet>
+
+                    <!-- INFORMATIONS DE L'EXERCICE -->
+                    <group>
+
+                        <group string="Identification">
+                            <field name="annee"/>
+                            <field name="excedent_n_moins_1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+
+                        <!-- RESULTATS CALCULES -->
+                        <group string="Résultats calculés">
+                            <field name="total_recettes"/>
+                            <field name="total_depenses"/>
+                            <field name="fonds_libre"/>
+                        </group>
+
+                    </group>
+
+                    <!-- RECETTES ET DEPENSES -->
+                    <notebook>
+
+                        <!-- PAGE RECETTES -->
+                        <page string="Recettes">
+
+                            <field name="recette_ids">
+
+                                <tree>
+                                    <field name="numero_ordre_recette"/>
+                                    <field name="date_ordre_recette"/>
+                                    <field name="compte_id"/>
+                                    <field name="montant"/>
+                                    <field name="etat"/>
+                                </tree>
+
+                            </field>
+
+                        </page>
+
+                        <!-- PAGE DEPENSES -->
+                        <page string="Dépenses">
+
+                            <field name="depense_ids">
+
+                                <tree>
+                                    <field name="date_comptable"/>
+                                    <field name="compte_id"/>
+                                    <field name="libelle"/>
+                                    <field name="beneficiaire"/>
+                                    <field name="montant"/>
+                                </tree>
+
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+                 <div class="oe_chatter">
+                 <field name="message_follower_ids"/>
+                  <field name="message_ids"/>
+                </div>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <!-- ===================================================== -->
+    <!-- VUE LISTE : EXERCICES -->
+    <!-- ===================================================== -->
+
+    <record id="view_commune_exercice_tree" model="ir.ui.view">
+
+        <field name="name">commune.exercice.tree</field>
+        <field name="model">commune.exercice</field>
+
+        <field name="arch" type="xml">
+
+            <tree>
+
+                <field name="annee"/>
+                <field name="excedent_n_moins_1"/>
+                <field name="total_recettes"/>
+                <field name="total_depenses"/>
+                <field name="fonds_libre"/>
+                <field name="etat"/>
+
+            </tree>
+
+        </field>
+
+    </record>
+
+
+    <!-- ===================================================== -->
+    <!-- VUE GRAPHIQUE -->
+    <!-- ===================================================== -->
+
+    <record id="view_commune_exercice_graph" model="ir.ui.view">
+
+        <field name="name">commune.exercice.graph</field>
+        <field name="model">commune.exercice</field>
+
+        <field name="arch" type="xml">
+
+            <graph string="Évolution du Fonds Libre" type="bar">
+
+                <field name="annee" type="row"/>
+                <field name="fonds_libre" type="measure"/>
+
+            </graph>
+
+        </field>
+
+    </record>
+
+
+    <!-- ===================================================== -->
+    <!-- ACTION -->
+    <!-- ===================================================== -->
+
+    <record id="action_commune_exercice" model="ir.actions.act_window">
+
+        <field name="name">Exercices</field>
+        <field name="res_model">commune.exercice</field>
+        <field name="view_mode">tree,form,graph</field>
+
+    </record>
+
+
+    <!-- ===================================================== -->
+    <!-- MENUS -->
+    <!-- ===================================================== -->
+
+    <menuitem
+        id="menu_commune_finances_root"
+        name="Commune Finances"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_commune_exercice"
+        name="Exercices"
+        parent="menu_commune_finances_root"
+        action="action_commune_exercice"
+        sequence="10"
+    />
+
+</odoo>

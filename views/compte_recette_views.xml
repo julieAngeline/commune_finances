@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_commune_compte_recette_form" model="ir.ui.view">
+        <field name="name">commune.compte.recette.form</field>
+        <field name="model">commune.compte.recette</field>
+        <field name="arch" type="xml">
+            <form string="Compte comptable de recette">
+                <sheet>
+                    <group>
+                        <field name="code_compte"/>
+                        <field name="libelle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commune_compte_recette_tree" model="ir.ui.view">
+        <field name="name">commune.compte.recette.tree</field>
+        <field name="model">commune.compte.recette</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code_compte"/>
+                <field name="libelle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_commune_compte_recette" model="ir.actions.act_window">
+        <field name="name">Comptes de recette</field>
+        <field name="res_model">commune.compte.recette</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_commune_compte_recette" name="Comptes de recette" parent="menu_commune_finances_root" action="action_commune_compte_recette" sequence="5"/>
+
+</odoo>

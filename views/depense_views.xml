@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_commune_depense_form" model="ir.ui.view">
+        <field name="name">commune.depense.form</field>
+        <field name="model">commune.depense</field>
+        <field name="arch" type="xml">
+            <form string="Dépense">
+                <sheet>
+                    <group>
+                        <group string="Identification">
+                            <field name="numero_bordereau"/>
+                            <field name="exercice_id"/>
+                            <field name="budget_id"/>
+                            <field name="compte_id"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="date_reelle"/>
+                            <field name="date_comptable"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="libelle"/>
+                        <field name="beneficiaire"/>
+                        <field name="montant"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group string="Suivi budgétaire">
+                        <field name="prevision"/>
+                        <field name="cumule"/>
+                        <field name="disponible"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commune_depense_tree" model="ir.ui.view">
+        <field name="name">commune.depense.tree</field>
+        <field name="model">commune.depense</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date_comptable" string="Date"/>
+                <field name="compte_id" string="Compte"/>
+                <field name="libelle" string="Désignation / Objet"/>
+                <field name="beneficiaire"/>
+                <field name="montant" string="Engagement" sum="Total"/>
+                <field name="prevision" string="Crédits modifiés"/>
+                <field name="cumule" string="Cumul"/>
+                <field name="disponible" string="Disponible"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_commune_depense_graph" model="ir.ui.view">
+        <field name="name">commune.depense.graph</field>
+        <field name="model">commune.depense</field>
+        <field name="arch" type="xml">
+            <graph string="Dépenses par exercice" type="bar">
+                <field name="exercice_id" type="row"/>
+                <field name="montant" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_commune_depense" model="ir.actions.act_window">
+        <field name="name">Dépenses</field>
+        <field name="res_model">commune.depense</field>
+        <field name="view_mode">tree,form,graph</field>
+    </record>
+
+    <menuitem id="menu_commune_depense" name="Dépenses" parent="menu_commune_finances_root" action="action_commune_depense" sequence="20"/>
+
+</odoo>

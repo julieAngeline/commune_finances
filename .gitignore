@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Odoo
+*.log
+
+# Environnement virtuel
+venv/
+.venv/
+
+# Configuration locale
+.env
+
+# Éditeurs
+.vscode/
+.idea/
+
+# Fichiers temporaires
+*.tmp
+*.swp

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_commune_exercice_dashboard" model="ir.ui.view">
+        <field name="name">commune.exercice.dashboard</field>
+        <field name="model">commune.exercice</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard">
+                <field name="annee"/>
+                <field name="excedent_n_moins_1"/>
+                <field name="total_recettes"/>
+                <field name="total_depenses"/>
+                <field name="fonds_libre"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click" style="padding: 16px; border-radius: 8px;">
+                            <div class="o_kanban_card_header">
+                                <h3>Exercice <field name="annee"/></h3>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-6">
+                                    <span style="font-size: 12px; color: #888;">Excédent N-1</span><br/>
+                                    <span style="font-size: 18px;"><field name="excedent_n_moins_1"/></span>
+                                </div>
+                                <div class="col-6">
+                                    <span style="font-size: 12px; color: #888;">Recettes</span><br/>
+                                    <span style="font-size: 18px; color: #28a745;">+ <field name="total_recettes"/></span>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 8px;">
+                                <div class="col-6">
+                                    <span style="font-size: 12px; color: #888;">Dépenses</span><br/>
+                                    <span style="font-size: 18px; color: #dc3545;">− <field name="total_depenses"/></span>
+                                </div>
+                                <div class="col-6">
+                                    <span style="font-size: 12px; color: #888;">Fonds Libre</span><br/>
+                                    <span t-attf-style="font-size: 24px; font-weight: bold; color: {{ record.fonds_libre.raw_value &lt; 0 ? '#dc3545' : '#28a745' }};">
+                                        <field name="fonds_libre"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_commune_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord</field>
+        <field name="res_model">commune.exercice</field>
+        <field name="view_mode">kanban,tree,form,graph</field>
+        <field name="view_id" ref="view_commune_exercice_dashboard"/>
+    </record>
+
+    <menuitem id="menu_commune_dashboard" name="Tableau de bord" parent="menu_commune_finances_root" action="action_commune_dashboard" sequence="1"/>
+
+</odoo>

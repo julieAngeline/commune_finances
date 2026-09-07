@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_commune_compte_depense_form" model="ir.ui.view">
+        <field name="name">commune.compte.depense.form</field>
+        <field name="model">commune.compte.depense</field>
+        <field name="arch" type="xml">
+            <form string="Compte de dépense">
+                <sheet>
+                    <group>
+                        <field name="code_compte"/>
+                        <field name="libelle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_commune_compte_depense_tree" model="ir.ui.view">
+        <field name="name">commune.compte.depense.tree</field>
+        <field name="model">commune.compte.depense</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code_compte"/>
+                <field name="libelle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_commune_compte_depense" model="ir.actions.act_window">
+        <field name="name">Comptes de dépense</field>
+        <field name="res_model">commune.compte.depense</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_commune_compte_depense" name="Comptes de dépense" parent="menu_commune_finances_root" action="action_commune_compte_depense" sequence="6"/>
+</odoo>

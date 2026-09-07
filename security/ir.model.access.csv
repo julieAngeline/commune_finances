@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_commune_exercice,commune.exercice,model_commune_exercice,base.group_user,1,1,1,1
+access_commune_compte_recette,commune.compte.recette,model_commune_compte_recette,base.group_user,1,1,1,1
+access_commune_regisseur,commune.regisseur,model_commune_regisseur,base.group_user,1,1,1,1
+access_commune_recette,commune.recette,model_commune_recette,base.group_user,1,1,1,1
+access_commune_compte_depense,commune.compte.depense,model_commune_compte_depense,base.group_user,1,1,1,1
+access_commune_budget_depense,commune.budget.depense,model_commune_budget_depense,base.group_user,1,1,1,1
+access_commune_depense,commune.depense,model_commune_depense,base.group_user,1,1,1,1
