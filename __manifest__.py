@@ -21,6 +21,14 @@
     'views/recette_views.xml',
     'views/depense_views.xml',
 ],
+      'assets': {
+        'web.assets_frontend': [
+            'commune_finances/static/src/css/login.css',
+        ],
+        'web.assets_backend': [
+        'commune_finances/static/src/js/recette_popup.js',
+    ],
+    },
     'installable': True,
     'application': True,
 }
