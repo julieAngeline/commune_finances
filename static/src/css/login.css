@@ -1,0 +1,58 @@
+/* =========================================
+   BACKGROUND PAGE LOGIN ODOO
+   ========================================= */
+
+html,
+body {
+    min-height: 100% !important;
+}
+
+body {
+    background-image: url('/commune_finances/static/src/img/login/login_bg.jpg') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+/* Fond transparent ho an'ilay carte login */
+body .o_database_list {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 12px !important;
+}
+
+/* Formulaire login */
+body .oe_login_form {
+    background: transparent !important;
+}
+
+/* =========================================
+   FANAKELEZANA NY BOATY LOGIN
+   ========================================= */
+
+body .o_database_list {
+    max-width: 380px !important;
+    margin: 40px auto !important;
+    padding: 20px !important;
+    font-size: 14px !important;
+}
+
+body .o_database_list .form-control {
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+}
+
+body .o_database_list img {
+    max-width: 100px !important;
+    height: auto !important;
+}
+
+body .o_database_list h1,
+body .o_database_list h2 {
+    font-size: 18px !important;
+}
+
+body .oe_login_form .btn {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+}

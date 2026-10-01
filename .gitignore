@@ -19,3 +19,6 @@ venv/
 # Fichiers temporaires
 *.tmp
 *.swp
+__pycache__/
+*.pyc
+.vscode/

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+
+    <!-- FORM VIEW -->
     <record id="view_commune_budget_depense_form" model="ir.ui.view">
         <field name="name">commune.budget.depense.form</field>
         <field name="model">commune.budget.depense</field>
@@ -7,39 +9,80 @@
             <form string="Budget de dépense">
                 <sheet>
                     <group>
-                        <field name="exercice_id"/>
-                        <field name="compte_id"/>
-                        <field name="prevision"/>
-                        <field name="currency_id" invisible="1"/>
+                        <group string="Identification">
+                            <field name="exercice_id"/>
+                            <field name="compte_id"/>
+                            <field name="objet"/>
+                        </group>
+                        <group string="Montant initial">
+                            <field name="credit_ouvert"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
                     </group>
-                    <group string="Suivi budgétaire">
-                        <field name="cumule"/>
-                        <field name="disponible"/>
+
+                    <group string="Suivi budgétaire" col="3">
+                        <field name="cumule" readonly="1"/>
+                        <field name="disponible" readonly="1"/>
+                        <field name="taux_consommation" widget="progressbar" readonly="1"/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
+    <!-- LIST / TREE VIEW -->
     <record id="view_commune_budget_depense_tree" model="ir.ui.view">
         <field name="name">commune.budget.depense.tree</field>
         <field name="model">commune.budget.depense</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-danger="taux_consommation &gt;= 90"
+                  decoration-warning="taux_consommation &gt;= 70 and taux_consommation &lt; 90">
                 <field name="exercice_id"/>
                 <field name="compte_id"/>
-                <field name="prevision"/>
-                <field name="cumule"/>
-                <field name="disponible"/>
+                <field name="objet"/>
+                <field name="credit_ouvert" sum="Total Crédit"/>
+                <field name="cumule" sum="Total Engagé"/>
+                <field name="disponible" sum="Total Disponible"/>
+                <field name="taux_consommation" widget="progressbar"/>
             </tree>
         </field>
     </record>
 
-    <record id="action_commune_budget_depense" model="ir.actions.act_window">
-        <field name="name">Budgets de dépense</field>
-        <field name="res_model">commune.budget.depense</field>
-        <field name="view_mode">tree,form</field>
+    <!-- SEARCH VIEW -->
+    <record id="view_commune_budget_depense_search" model="ir.ui.view">
+        <field name="name">commune.budget.depense.search</field>
+        <field name="model">commune.budget.depense</field>
+        <field name="arch" type="xml">
+            <search string="Recherche Budget Dépense">
+                <field name="objet"/>
+                <field name="compte_id"/>
+                <field name="exercice_id"/>
+
+                <separator/>
+                <filter string="Crédit Épuisé (>90%)" name="epuise" domain="[('taux_consommation', '>=', 90)]"/>
+
+                <group expand="0" string="Regrouper par">
+                    <filter string="Exercice" name="group_exercice" context="{'group_by': 'exercice_id'}"/>
+                    <filter string="Compte" name="group_compte" context="{'group_by': 'compte_id'}"/>
+                </group>
+            </search>
+        </field>
     </record>
 
-    <menuitem id="menu_commune_budget_depense" name="Budgets" parent="menu_commune_finances_root" action="action_commune_budget_depense" sequence="7"/>
+    <!-- ACTION -->
+    <record id="action_commune_budget_depense" model="ir.actions.act_window">
+        <field name="name">Budget de dépenses</field>
+        <field name="res_model">commune.budget.depense</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_commune_budget_depense_search"/>
+    </record>
+
+    <!-- MENU ITEM -->
+    <menuitem
+        id="menu_commune_budget_depense"
+        name="💼 Budget de dépenses"
+        parent="menu_commune_finances_root"
+        action="action_commune_budget_depense"
+        sequence="15"/>
+
 </odoo>

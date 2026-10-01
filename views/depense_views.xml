@@ -2,65 +2,85 @@
 <odoo>
 
     <record id="view_commune_depense_form" model="ir.ui.view">
+
         <field name="name">commune.depense.form</field>
         <field name="model">commune.depense</field>
+
         <field name="arch" type="xml">
+
             <form string="Dépense">
+
                 <sheet>
-                    <group>
-                        <group string="Identification">
-                            <field name="numero_bordereau"/>
-                            <field name="exercice_id"/>
-                            <field name="budget_id"/>
-                            <field name="compte_id"/>
-                        </group>
-                        <group string="Dates">
-                            <field name="date_reelle"/>
-                            <field name="date_comptable"/>
-                        </group>
+
+                    <group string="Identification">
+                        <field name="exercice_id"/>
+                        <field name="budget_id" domain="[('exercice_id', '=', exercice_id)]"/>
+                        <field name="compte_id" readonly="1"/>
                     </group>
-                    <group>
-                        <field name="libelle"/>
-                        <field name="beneficiaire"/>
+                      <group col="2">
+                     <group>
+                    <group string="Dépense">
+                        <field name="date"/>
+                        <field name="objet"/>
                         <field name="montant"/>
                         <field name="currency_id" invisible="1"/>
                     </group>
-                    <group string="Suivi budgétaire">
-                        <field name="prevision"/>
-                        <field name="cumule"/>
-                        <field name="disponible"/>
                     </group>
+                    <group>
+
+                    <group string="Suivi budgétaire">
+                        <field name="credit_ouvert" readonly="1"/>
+                        <field name="cumule" readonly="1"/>
+                        <field name="disponible" readonly="1"/>
+                    </group>
+                    </group>
+                    </group>
+
                 </sheet>
+
             </form>
+
         </field>
+
     </record>
+    
 
     <record id="view_commune_depense_tree" model="ir.ui.view">
+
         <field name="name">commune.depense.tree</field>
         <field name="model">commune.depense</field>
+
         <field name="arch" type="xml">
+
             <tree>
-                <field name="date_comptable" string="Date"/>
+                <field name="exercice_id" string="Exercice"/>
                 <field name="compte_id" string="Compte"/>
-                <field name="libelle" string="Désignation / Objet"/>
-                <field name="beneficiaire"/>
-                <field name="montant" string="Engagement" sum="Total"/>
-                <field name="prevision" string="Crédits modifiés"/>
+                <field name="date" string="Date"/>
+                <field name="objet" string="Objet"/>
+                <field name="credit_ouvert" string="Crédit ouvert"/>
+                <field name="montant" string="Montant" sum="Total"/>
                 <field name="cumule" string="Cumul"/>
                 <field name="disponible" string="Disponible"/>
             </tree>
+
         </field>
+
     </record>
 
     <record id="view_commune_depense_graph" model="ir.ui.view">
+
         <field name="name">commune.depense.graph</field>
         <field name="model">commune.depense</field>
+
         <field name="arch" type="xml">
+
             <graph string="Dépenses par exercice" type="bar">
                 <field name="exercice_id" type="row"/>
                 <field name="montant" type="measure"/>
             </graph>
+
         </field>
+
     </record>
 
     <record id="action_commune_depense" model="ir.actions.act_window">
@@ -69,6 +89,11 @@
         <field name="view_mode">tree,form,graph</field>
     </record>
 
-    <menuitem id="menu_commune_depense" name="Dépenses" parent="menu_commune_finances_root" action="action_commune_depense" sequence="20"/>
+    <menuitem
+    id="menu_commune_depense"
+    name="💸 Dépenses"
+    parent="menu_commune_finances_root"
+    action="action_commune_depense"
+    sequence="20"/>
 
 </odoo>

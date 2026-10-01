@@ -1,63 +1,93 @@
-import re
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
 import datetime
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class CommuneRecette(models.Model):
     _name = 'commune.recette'
-    _description = 'Recette (bordereau du Trésor)'
-    _order = 'date_ordre_recette desc'
+    _description = 'Recette Communale'
+    _order = 'date_ordre_recette desc, id desc'
 
-    # --- Identification (le vrai identifiant unique) ---
-    numero_ordre_recette = fields.Char(string="N° Ordre de recette", required=True)
-    date_ordre_recette = fields.Date(string="Date de l'ordre de recette", required=True)
-
-    # --- Déclaration (peut se répéter, pas unique) ---
-    numero_declaration_recette = fields.Char(string="N° Déclaration de recette")
-    date_declaration_recette = fields.Date(string="Date de déclaration de recette")
-
-    # --- Versement au Trésor ---
-    date_versement = fields.Date(string="Date de versement au Trésor", required=True)
-
-    # --- Période de versement (début, fin, montant) ---
-    periode_debut = fields.Date(string="Période - Début")
-    periode_fin = fields.Date(string="Période - Fin")
-    periode_montant = fields.Monetary(string="Montant de la période", currency_field='currency_id')
-
-    # --- Rattachements ---
-    exercice_id = fields.Many2one('commune.exercice', string='Exercice', required=True)
-    compte_id = fields.Many2one('commune.compte.recette', string='Compte', required=True)
-    regisseur_id = fields.Many2one('commune.regisseur', string='Régisseur', required=True)
-
-    categorie = fields.Selection([
-        ('regie', 'Régie'),
-        ('impot', 'Impôt'),
-        ('etat_civil', 'État Civil'),
-        ('autre', 'Autre'),
-    ], string='Catégorie / Service', required=True)
-
-    etat = fields.Selection([
-        ('brouillon', 'Brouillon'),
-        ('verse_tresor', 'Versé au Trésor'),
-        ('valide_tresor', 'Validé par le Trésor'),
-        ('ecart', 'Écart détecté'),
-    ], string='État', default='brouillon', required=True)
-
-    montant = fields.Monetary(string='Montant', currency_field='currency_id', required=True)
-    currency_id = fields.Many2one(
-        'res.currency', string='Devise',
-        default=lambda self: self.env.company.currency_id
+    # ==========================================================
+    # VERSEMENT AU TRÉSOR
+    # ==========================================================
+    date_versement = fields.Date(
+        string="Date de versement",
+        required=True
     )
-    libelle = fields.Char(string='Libellé / Observation')
 
-    # --- Anti-doublon : sur le vrai identifiant unique ---
+    # ==========================================================
+    # DÉCLARATION DE RECETTE
+    # ==========================================================
+    numero_declaration_recette = fields.Char(
+        string="N° Déclaration de recette"
+    )
+    date_declaration_recette = fields.Date(
+        string="Date de déclaration de recette"
+    )
+
+    # ==========================================================
+    # ORDRE DE RECETTE
+    # ==========================================================
+    numero_ordre_recette = fields.Char(
+        string="N° Ordre de recette",
+        required=True
+    )
+    date_ordre_recette = fields.Date(
+        string="Date de l'ordre de recette",
+        required=True
+    )
+
+    # ==========================================================
+    # PÉRIODE
+    # ==========================================================
+    periode_debut = fields.Date(
+        string="Période - Début"
+    )
+    periode_fin = fields.Date(
+        string="Période - Fin"
+    )
+
+    # ==========================================================
+    # MONTANT
+    # ==========================================================
+    montant = fields.Monetary(
+        string="Montant",
+        currency_field='currency_id',
+        required=True
+    )
+
+    currency_id = fields.Many2one(
+        'res.currency',
+        string="Devise",
+        default=lambda self: self.env.company.currency_id,
+        required=True
+    )
+
+    # ==========================================================
+    # EXERCICE
+    # ==========================================================
+    exercice_id = fields.Many2one(
+        'commune.exercice',
+        string="Exercice",
+        required=True,
+        ondelete='restrict'
+    )
+
+    # ==========================================================
+    # CONTRAINTE : NUMÉRO D'ORDRE UNIQUE
+    # ==========================================================
     _sql_constraints = [
-        ('numero_ordre_recette_unique', 'UNIQUE(numero_ordre_recette)',
-         "Ce numéro d'ordre de recette existe déjà ! Vérifiez avant de continuer.")
+        (
+            'numero_ordre_recette_unique',
+            'UNIQUE(numero_ordre_recette)',
+            "Ce numéro d'ordre de recette existe déjà ! Vérifiez avant de continuer."
+        )
     ]
 
+    # ==========================================================
+    # CONTRAINTES MÉTIERS
+    # ==========================================================
     @api.constrains('montant')
     def _check_montant_positif(self):
         for record in self:
@@ -67,58 +97,57 @@ class CommuneRecette(models.Model):
     @api.constrains('date_ordre_recette', 'date_versement')
     def _check_ordre_versement(self):
         for record in self:
-            if record.date_ordre_recette < record.date_versement:
+            if record.date_ordre_recette and record.date_versement and record.date_ordre_recette < record.date_versement:
                 raise ValidationError(
-                    "Impossible : l'ordre de recette ne peut pas être daté avant le versement au Trésor. "
-                    "Le régisseur doit d'abord verser au Trésor, puis établir l'ordre de recette."
+                    "Impossible : la date de l'ordre de recette ne peut pas être antérieure à la date de versement au Trésor."
                 )
 
     @api.constrains('periode_debut', 'periode_fin')
     def _check_periode_coherente(self):
         for record in self:
             if record.periode_debut and record.periode_fin and record.periode_fin < record.periode_debut:
-                raise ValidationError(
-                    "La date de fin de période ne peut pas être antérieure à la date de début."
-                )
+                raise ValidationError("La date de fin de période ne peut pas être antérieure à la date de début.")
 
     @api.constrains('exercice_id', 'date_versement')
     def _check_date_limite_complementaire(self):
         for record in self:
             if record.exercice_id and record.date_versement:
-                limite = datetime.date(record.exercice_id.annee + 1, 7, 31)
-                if record.date_versement > limite:
-                    raise ValidationError(
-                        f"Impossible : la période complémentaire de l'exercice "
-                        f"{record.exercice_id.annee} pour les recettes se termine "
-                        f"le 31 juillet {record.exercice_id.annee + 1}."
-                    )
+                # On suppose que `exercice_id.annee` est un entier (ex: 2025)
+                try:
+                    annee_exercice = int(record.exercice_id.annee)
+                    limite = datetime.date(annee_exercice + 1, 7, 31)
+                    if record.date_versement > limite:
+                        raise ValidationError(
+                            f"Impossible : la période complémentaire de l'exercice {annee_exercice} "
+                            f"pour les recettes se termine le 31 juillet {annee_exercice + 1}."
+                        )
+                except (ValueError, TypeError):
+                    pass
 
     @api.constrains('exercice_id')
     def _check_exercice_non_cloture(self):
         for record in self:
-            if record.exercice_id.etat == 'cloture':
+            if record.exercice_id and getattr(record.exercice_id, 'etat', False) == 'cloture':
                 raise ValidationError(
                     f"Impossible : l'exercice {record.exercice_id.annee} est clôturé. "
-                    f"Aucune recette ne peut plus y être ajoutée."
+                    f"Aucune recette ne peut plus être ajoutée."
                 )
 
+    # ==========================================================
+    # NOTIFICATION LORS DE LA CRÉATION
+    # ==========================================================
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-
-        # Utilisateur qui doit recevoir la notification
-        responsable = self.env.ref('base.user_admin')
-
         for record in records:
-            record.exercice_id.message_post(
-                body=(
-                    f"<b>Nouvelle recette saisie</b><br/>"
-                    f"Régisseur : {record.regisseur_id.name}<br/>"
-                    f"N° ordre de recette : {record.numero_ordre_recette}<br/>"
-                    f"Montant : {record.montant} Ar"
-                ),
-                partner_ids=[responsable.partner_id.id],
-                subtype_xmlid='mail.mt_comment',
-            )
-
+            if record.exercice_id:
+                record.exercice_id.message_post(
+                    body=(
+                        f"<b>Nouvelle recette enregistrée</b><br/>"
+                        f"N° Ordre : {record.numero_ordre_recette}<br/>"
+                        f"Montant : {record.montant} {record.currency_id.symbol or ''}"
+                    ),
+                    partner_ids=self.env.user.partner_id.commercial_partner_id.ids,
+                    subtype_xmlid='mail.mt_comment',
+                )
         return records

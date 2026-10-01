@@ -1,79 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+    <!-- VUE FORMULAIRE : RECETTE -->
     <record id="view_commune_recette_form" model="ir.ui.view">
         <field name="name">commune.recette.form</field>
         <field name="model">commune.recette</field>
         <field name="arch" type="xml">
             <form string="Recette">
                 <sheet>
-                    <group>
-                        <group string="Identification">
-                            <field name="numero_ordre_recette"/>
-                            <field name="date_ordre_recette"/>
-                            <field name="numero_declaration_recette"/>
-                            <field name="date_declaration_recette"/>
-                        </group>
-                        <group string="Rattachement">
-                            <field name="exercice_id"/>
-                            <field name="compte_id"/>
-                            <field name="regisseur_id"/>
-                            <field name="categorie"/>
-                        </group>
+                    <group string="Rattachement">
+                        <field name="exercice_id"/>
                     </group>
-                    <group>
-                        <group string="Versement">
-                            <field name="date_versement"/>
-                            <field name="montant"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="etat"/>
-                        </group>
-                        <group string="Période de versement">
-                            <field name="periode_debut"/>
-                            <field name="periode_fin"/>
-                            <field name="periode_montant"/>
-                        </group>
+                    <group string="Versement au Trésor">
+                        <field name="date_versement"/>
+                        <field name="montant"/>
+                        <field name="currency_id" invisible="1"/>
                     </group>
-                    <group>
-                        <field name="libelle"/>
+                    <group string="Déclaration de recette">
+                        <field name="numero_declaration_recette"/>
+                        <field name="date_declaration_recette"/>
+                    </group>
+                    <group string="Ordre de recette">
+                        <field name="numero_ordre_recette"/>
+                        <field name="date_ordre_recette"/>
+                    </group>
+                    <group string="Période">
+                        <field name="periode_debut"/>
+                        <field name="periode_fin"/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
+    <!-- VUE LISTE : RECETTES -->
     <record id="view_commune_recette_tree" model="ir.ui.view">
         <field name="name">commune.recette.tree</field>
         <field name="model">commune.recette</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="Recettes">
+                <field name="exercice_id"/>
+                <field name="date_versement"/>
+                <field name="numero_declaration_recette"/>
+                <field name="date_declaration_recette"/>
                 <field name="numero_ordre_recette"/>
                 <field name="date_ordre_recette"/>
-                <field name="regisseur_id"/>
-                <field name="compte_id"/>
-                <field name="categorie"/>
-                <field name="etat"/>
+                <field name="periode_debut"/>
+                <field name="periode_fin"/>
                 <field name="montant" sum="Total"/>
             </tree>
         </field>
     </record>
 
+    <!-- VUE KANBAN : RECETTES -->
     <record id="view_commune_recette_kanban" model="ir.ui.view">
         <field name="name">commune.recette.kanban</field>
         <field name="model">commune.recette</field>
         <field name="arch" type="xml">
             <kanban>
                 <field name="numero_ordre_recette"/>
-                <field name="regisseur_id"/>
+                <field name="date_versement"/>
                 <field name="montant"/>
-                <field name="etat"/>
+                <field name="exercice_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card oe_kanban_global_click">
                             <strong><field name="numero_ordre_recette"/></strong>
-                            <div>Régisseur : <field name="regisseur_id"/></div>
+                            <div>Exercice : <field name="exercice_id"/></div>
+                            <div>Date de versement : <field name="date_versement"/></div>
                             <div>Montant : <field name="montant"/></div>
-                            <div>État : <field name="etat"/></div>
                         </div>
                     </t>
                 </templates>
@@ -81,38 +76,48 @@
         </field>
     </record>
 
+    <!-- VUE GRAPHIQUE -->
     <record id="view_commune_recette_graph" model="ir.ui.view">
         <field name="name">commune.recette.graph</field>
         <field name="model">commune.recette</field>
         <field name="arch" type="xml">
-            <graph string="Recettes par catégorie" type="bar">
-                <field name="categorie" type="row"/>
+            <graph string="Recettes par exercice" type="bar">
+                <field name="exercice_id" type="row"/>
                 <field name="montant" type="measure"/>
             </graph>
         </field>
     </record>
 
+    <!-- VUE RECHERCHE -->
     <record id="view_commune_recette_search" model="ir.ui.view">
         <field name="name">commune.recette.search</field>
         <field name="model">commune.recette</field>
         <field name="arch" type="xml">
             <search>
                 <field name="numero_ordre_recette"/>
-                <field name="regisseur_id"/>
-                <field name="compte_id"/>
-                <filter string="Par catégorie" name="group_categorie" context="{'group_by': 'categorie'}"/>
-                <filter string="Par régisseur" name="group_regisseur" context="{'group_by': 'regisseur_id'}"/>
-                <filter string="Par état" name="group_etat" context="{'group_by': 'etat'}"/>
+                <field name="numero_declaration_recette"/>
+                <field name="exercice_id"/>
+                <field name="date_versement"/>
+                <field name="date_ordre_recette"/>
+                <filter string="Par exercice" name="group_exercice" context="{'group_by': 'exercice_id'}"/>
             </search>
         </field>
     </record>
 
+    <!-- ACTION PRINCIPALE : RECETTES -->
     <record id="action_commune_recette" model="ir.actions.act_window">
         <field name="name">Recettes</field>
         <field name="res_model">commune.recette</field>
         <field name="view_mode">kanban,tree,form,graph</field>
+        <field name="search_view_id" ref="view_commune_recette_search"/>
     </record>
 
-    <menuitem id="menu_commune_recette" name="Recettes" parent="menu_commune_finances_root" action="action_commune_recette" sequence="15"/>
+    <!-- MENU RECETTES -->
+    <menuitem
+        id="menu_commune_recette"
+        name="💰 Recettes"
+        parent="menu_commune_finances_root"
+        action="action_commune_recette"
+        sequence="10"/>
 
 </odoo>

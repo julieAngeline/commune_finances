@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- ===================================================== -->
-    <!-- VUE FORMULAIRE : EXERCICE -->
-    <!-- ===================================================== -->
-
     <record id="view_commune_exercice_form" model="ir.ui.view">
+
         <field name="name">commune.exercice.form</field>
         <field name="model">commune.exercice</field>
 
@@ -13,112 +10,98 @@
 
             <form string="Exercice budgétaire">
 
-                <!-- ETAT DE L'EXERCICE -->
                 <header>
 
-                    <button
-                        name="action_passer_periode_complementaire"
-                        string="Passer en période complémentaire"
-                        type="object"
-                        invisible="etat != 'ouvert'"
-                    />
+                    <button name="action_passer_periode_complementaire"
+                            string="Passer en période complémentaire"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="etat != 'ouvert'"/>
 
-                    <button
-                        name="action_cloturer"
-                        string="Clôturer"
-                        type="object"
-                        invisible="etat != 'complementaire'"
-                    />
+                    <button name="action_cloturer"
+                            string="Clôturer"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="etat != 'complementaire'"/>
 
-                    <button
-                        name="action_reouvrir"
-                        string="Réouvrir"
-                        type="object"
-                        invisible="etat != 'cloture'"
-                    />
+                    <button name="action_reouvrir"
+                            string="Rouvrir"
+                            type="object"
+                            invisible="etat != 'cloture'"/>
 
-                    <field
-                        name="etat"
-                        widget="statusbar"
-                        statusbar_visible="ouvert,complementaire,cloture"
-                    />
+                    <field name="etat" widget="statusbar"
+                           statusbar_visible="ouvert,complementaire,cloture"/>
 
                 </header>
 
                 <sheet>
 
-                    <!-- INFORMATIONS DE L'EXERCICE -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="annee" placeholder="Année"/>
+                        </h1>
+                    </div>
+
                     <group>
 
-                        <group string="Identification">
-                            <field name="annee"/>
+                        <group string="Excédent reporté">
                             <field name="excedent_n_moins_1"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
 
-                        <!-- RESULTATS CALCULES -->
-                        <group string="Résultats calculés">
-                            <field name="total_recettes"/>
-                            <field name="total_depenses"/>
-                            <field name="fonds_libre"/>
+                        <group string="Synthèse financière">
+                            <field name="total_recettes" readonly="1"/>
+                            <field name="total_depenses" readonly="1"/>
+                            <field name="fonds_libre" readonly="1"/>
                         </group>
 
                     </group>
 
-                    <!-- RECETTES ET DEPENSES -->
                     <notebook>
 
-                        <!-- PAGE RECETTES -->
                         <page string="Recettes">
-
                             <field name="recette_ids">
-
                                 <tree>
                                     <field name="numero_ordre_recette"/>
                                     <field name="date_ordre_recette"/>
-                                    <field name="compte_id"/>
-                                    <field name="montant"/>
-                                    <field name="etat"/>
+                                    <field name="date_versement"/>
+                                    <field name="montant" sum="Total"/>
                                 </tree>
-
                             </field>
-
                         </page>
 
-                        <!-- PAGE DEPENSES -->
-                        <page string="Dépenses">
-
-                            <field name="depense_ids">
-
+                        <page string="Budgets de dépenses">
+                            <field name="budget_ids">
                                 <tree>
-                                    <field name="date_comptable"/>
                                     <field name="compte_id"/>
-                                    <field name="libelle"/>
-                                    <field name="beneficiaire"/>
-                                    <field name="montant"/>
+                                    <field name="objet"/>
+                                    <field name="credit_ouvert"/>
+                                    <field name="cumule"/>
+                                    <field name="disponible"/>
                                 </tree>
-
                             </field>
+                        </page>
 
+                        <page string="Dépenses">
+                            <field name="depense_ids">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="objet"/>
+                                    <field name="compte_id"/>
+                                    <field name="montant" sum="Total"/>
+                                </tree>
+                            </field>
                         </page>
 
                     </notebook>
 
                 </sheet>
-                 <div class="oe_chatter">
-                 <field name="message_follower_ids"/>
-                  <field name="message_ids"/>
-                </div>
 
             </form>
 
         </field>
+
     </record>
-
-
-    <!-- ===================================================== -->
-    <!-- VUE LISTE : EXERCICES -->
-    <!-- ===================================================== -->
 
     <record id="view_commune_exercice_tree" model="ir.ui.view">
 
@@ -128,73 +111,57 @@
         <field name="arch" type="xml">
 
             <tree>
-
                 <field name="annee"/>
+                <field name="etat"/>
                 <field name="excedent_n_moins_1"/>
                 <field name="total_recettes"/>
                 <field name="total_depenses"/>
                 <field name="fonds_libre"/>
-                <field name="etat"/>
-
             </tree>
 
         </field>
 
     </record>
 
+    <record id="view_commune_exercice_search" model="ir.ui.view">
 
-    <!-- ===================================================== -->
-    <!-- VUE GRAPHIQUE -->
-    <!-- ===================================================== -->
-
-    <record id="view_commune_exercice_graph" model="ir.ui.view">
-
-        <field name="name">commune.exercice.graph</field>
+        <field name="name">commune.exercice.search</field>
         <field name="model">commune.exercice</field>
 
         <field name="arch" type="xml">
 
-            <graph string="Évolution du Fonds Libre" type="bar">
+            <search>
+                <field name="annee"/>
 
-                <field name="annee" type="row"/>
-                <field name="fonds_libre" type="measure"/>
+                <filter string="Ouvert" name="filter_ouvert"
+                        domain="[('etat', '=', 'ouvert')]"/>
 
-            </graph>
+                <filter string="Période complémentaire" name="filter_complementaire"
+                        domain="[('etat', '=', 'complementaire')]"/>
+
+                <filter string="Clôturé" name="filter_cloture"
+                        domain="[('etat', '=', 'cloture')]"/>
+
+                <filter string="Par état" name="group_etat"
+                        context="{'group_by': 'etat'}"/>
+            </search>
 
         </field>
 
     </record>
 
-
-    <!-- ===================================================== -->
-    <!-- ACTION -->
-    <!-- ===================================================== -->
-
     <record id="action_commune_exercice" model="ir.actions.act_window">
-
         <field name="name">Exercices</field>
         <field name="res_model">commune.exercice</field>
-        <field name="view_mode">tree,form,graph</field>
-
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_commune_exercice_search"/>
     </record>
 
-
-    <!-- ===================================================== -->
-    <!-- MENUS -->
-    <!-- ===================================================== -->
-
-    <menuitem
-        id="menu_commune_finances_root"
-        name="Commune Finances"
-        sequence="10"
-    />
-
-    <menuitem
-        id="menu_commune_exercice"
-        name="Exercices"
-        parent="menu_commune_finances_root"
-        action="action_commune_exercice"
-        sequence="10"
-    />
+   <menuitem
+    id="menu_commune_exercice"
+    name="📅 Exercices"
+    parent="menu_commune_finances_root"
+    action="action_commune_exercice"
+    sequence="5"/>
 
 </odoo>
