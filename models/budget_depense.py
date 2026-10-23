@@ -4,120 +4,67 @@ from odoo.exceptions import ValidationError
 
 class CommuneBudgetDepense(models.Model):
     _name = 'commune.budget.depense'
-    _description = 'Budget de dépense'
-    _order = 'exercice_id desc, compte_id'
-
-    # ==========================================================
-    # EXERCICE ET COMPTE
-    # ==========================================================
+    _description = 'Budget de dépense (prévision)'
+    _order = 'exercice_id desc, code_compte'
 
     exercice_id = fields.Many2one(
-        'commune.exercice',
-        string="Exercice",
-        required=True,
-        ondelete='restrict'
-    )
+        'commune.exercice', string="Exercice", required=True, ondelete='restrict')
 
-    compte_id = fields.Many2one(
-        'commune.compte.depense',
-        string="Compte",
-        required=True,
-        ondelete='restrict'
-    )
+    code_compte = fields.Char(string="Compte (classe 2 ou 6)", required=True)
+    libelle = fields.Char(string="Libellé du compte")
 
-    # ==========================================================
-    # INFORMATIONS ET MONTANTS
-    # ==========================================================
-
-    objet = fields.Char(
-        string="Objet",
-        required=True
-    )
+    objet = fields.Char(string="Objet", required=True)
 
     currency_id = fields.Many2one(
-        'res.currency',
-        string="Devise",
-        default=lambda self: self.env.company.currency_id,
-        required=True
-    )
+        'res.currency', string="Devise",
+        default=lambda self: self.env.company.currency_id, required=True)
 
     credit_ouvert = fields.Monetary(
-        string="Crédit ouvert",
-        currency_field='currency_id',
-        required=True
-    )
+        string="Crédit ouvert", currency_field='currency_id', required=True)
 
-    depense_ids = fields.One2many(
-        'commune.depense',
-        'budget_id',
-        string="Dépenses"
-    )
-
-    # ==========================================================
-    # CHAMPS CALCULÉS
-    # ==========================================================
+    depense_ids = fields.One2many('commune.depense', 'budget_id', string="Dépenses")
 
     cumule = fields.Monetary(
-        string="Cumul",
-        currency_field='currency_id',
-        compute='_compute_cumule_disponible',
-        store=True
-    )
-
+        string="Cumul", currency_field='currency_id',
+        compute='_compute_cumule_disponible', store=True)
     disponible = fields.Monetary(
-        string="Disponible",
-        currency_field='currency_id',
-        compute='_compute_cumule_disponible',
-        store=True
-    )
-
+        string="Disponible", currency_field='currency_id',
+        compute='_compute_cumule_disponible', store=True)
     taux_consommation = fields.Float(
         string="Taux de consommation (%)",
-        compute='_compute_cumule_disponible',
-        store=True
-    )
+        compute='_compute_cumule_disponible', store=True)
 
     @api.depends('credit_ouvert', 'depense_ids.montant')
     def _compute_cumule_disponible(self):
         for budget in self:
-            total_cumule = sum(budget.depense_ids.mapped('montant'))
-            disponible = budget.credit_ouvert - total_cumule
-            
-            # Calcul du taux
-            if budget.credit_ouvert > 0:
-                taux = (total_cumule / budget.credit_ouvert) * 100
-            else:
-                taux = 0.0
+            total = sum(budget.depense_ids.mapped('montant'))
+            budget.cumule = total
+            budget.disponible = budget.credit_ouvert - total
+            budget.taux_consommation = (
+                total / budget.credit_ouvert * 100 if budget.credit_ouvert > 0 else 0.0)
 
-            budget.cumule = total_cumule
-            budget.disponible = disponible
-            budget.taux_consommation = taux
-
-    # ==========================================================
-    # NOM D'AFFICHAGE (ODOO 17+)
-    # ==========================================================
-
-    @api.depends('compte_id.code_compte', 'objet', 'exercice_id.annee')
+    @api.depends('code_compte', 'objet', 'exercice_id.annee')
     def _compute_display_name(self):
-        for record in self:
-            code = record.compte_id.code_compte if record.compte_id else ''
-            annee = record.exercice_id.annee if record.exercice_id else ''
-            record.display_name = f"{code} - {record.objet} - Exercice {annee}".strip(" -")
+        for r in self:
+            annee = r.exercice_id.annee or ''
+            r.display_name = f"{r.code_compte or ''} - {r.objet or ''} - Exercice {annee}"
 
-    # ==========================================================
-    # CONTRÔLES ET CONTRAINTES
-    # ==========================================================
+    @api.constrains('code_compte')
+    def _check_code_compte(self):
+        for r in self:
+            code = (r.code_compte or '').strip()
+            if not code.isdigit() or code[0] not in ('2', '6'):
+                raise ValidationError(
+                    "Le compte d'une dépense doit être numérique et "
+                    "commencer par 2 ou 6 (ex. 6062).")
 
     @api.constrains('credit_ouvert')
     def _check_credit_ouvert(self):
-        for record in self:
-            if record.credit_ouvert < 0:
+        for r in self:
+            if r.credit_ouvert < 0:
                 raise ValidationError("Le crédit ouvert ne peut pas être négatif.")
 
     _sql_constraints = [
-        (
-            'exercice_compte_unique',
-            'UNIQUE(exercice_id, compte_id)',
-            "Un budget existe déjà pour ce compte sur cet exercice."
-        )
+        ('exercice_compte_unique', 'UNIQUE(exercice_id, code_compte)',
+         "Un budget existe déjà pour ce compte sur cet exercice.")
     ]

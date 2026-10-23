@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <!-- FORM VIEW -->
@@ -11,7 +11,7 @@
                     <group>
                         <group string="Identification">
                             <field name="exercice_id"/>
-                            <field name="compte_id"/>
+                            <field name="code_compte"/>
                             <field name="objet"/>
                         </group>
                         <group string="Montant initial">
@@ -38,7 +38,7 @@
             <tree decoration-danger="taux_consommation &gt;= 90"
                   decoration-warning="taux_consommation &gt;= 70 and taux_consommation &lt; 90">
                 <field name="exercice_id"/>
-                <field name="compte_id"/>
+                <field name="code_compte"/>
                 <field name="objet"/>
                 <field name="credit_ouvert" sum="Total Crédit"/>
                 <field name="cumule" sum="Total Engagé"/>
@@ -55,7 +55,7 @@
         <field name="arch" type="xml">
             <search string="Recherche Budget Dépense">
                 <field name="objet"/>
-                <field name="compte_id"/>
+                <field name="code_compte"/>
                 <field name="exercice_id"/>
 
                 <separator/>
@@ -63,7 +63,7 @@
 
                 <group expand="0" string="Regrouper par">
                     <filter string="Exercice" name="group_exercice" context="{'group_by': 'exercice_id'}"/>
-                    <filter string="Compte" name="group_compte" context="{'group_by': 'compte_id'}"/>
+                    <filter string="Compte" name="group_compte" context="{'group_by': 'code_compte'}"/>
                 </group>
             </search>
         </field>

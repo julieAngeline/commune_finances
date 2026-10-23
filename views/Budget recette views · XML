@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_recette_list" model="ir.ui.view">
+        <field name="name">commune.budget.recette.list</field>
+        <field name="model">commune.budget.recette</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="exercice_id"/>
+                <field name="code_compte"/>
+                <field name="libelle"/>
+                <field name="objet"/>
+                <field name="prevision" sum="Total"/>
+                <field name="cumule" sum="Total"/>
+                <field name="ecart"/>
+                <field name="taux_realisation" widget="progressbar"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_budget_recette_form" model="ir.ui.view">
+        <field name="name">commune.budget.recette.form</field>
+        <field name="model">commune.budget.recette</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="exercice_id"/>
+                            <field name="code_compte"/>
+                            <field name="libelle"/>
+                            <field name="objet"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="prevision"/>
+                            <field name="cumule"/>
+                            <field name="ecart"/>
+                            <field name="taux_realisation"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_budget_recette" model="ir.actions.act_window">
+        <field name="name">Prévisions de recettes</field>
+        <field name="res_model">commune.budget.recette</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_budget_recette"
+              name="Prévisions de recettes"
+              parent="menu_commune_finances_root"
+              action="action_budget_recette"
+              sequence="25"/>
+</odoo>

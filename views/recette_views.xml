@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <!-- VUE FORMULAIRE : RECETTE -->
@@ -8,25 +8,38 @@
         <field name="arch" type="xml">
             <form string="Recette">
                 <sheet>
-                    <group string="Rattachement">
-                        <field name="exercice_id"/>
+                    <group>
+                        <!-- COLONNE GAUCHE -->
+                        <group string="Rattachement">
+                            <field name="exercice_id"/>
+                            <field name="budget_recette_id"/>
+                            <field name="code_compte"/>
+                        </group>
+                        <!-- COLONNE DROITE -->
+                        <group string="Versement au Trésor">
+                            <field name="date_versement"/>
+                            <field name="montant"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
                     </group>
-                    <group string="Versement au Trésor">
-                        <field name="date_versement"/>
-                        <field name="montant"/>
-                        <field name="currency_id" invisible="1"/>
+                    <group>
+                        <!-- COLONNE GAUCHE -->
+                        <group string="Ordre de recette">
+                            <field name="numero_ordre_recette"/>
+                            <field name="date_ordre_recette"/>
+                        </group>
+                        <!-- COLONNE DROITE -->
+                        <group string="Déclaration de recette">
+                            <field name="numero_declaration_recette"/>
+                            <field name="date_declaration_recette"/>
+                        </group>
                     </group>
-                    <group string="Déclaration de recette">
-                        <field name="numero_declaration_recette"/>
-                        <field name="date_declaration_recette"/>
-                    </group>
-                    <group string="Ordre de recette">
-                        <field name="numero_ordre_recette"/>
-                        <field name="date_ordre_recette"/>
-                    </group>
-                    <group string="Période">
-                        <field name="periode_debut"/>
-                        <field name="periode_fin"/>
+                    <group>
+                        <!-- COLONNE GAUCHE -->
+                        <group string="Période">
+                            <field name="periode_debut"/>
+                            <field name="periode_fin"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
@@ -40,6 +53,7 @@
         <field name="arch" type="xml">
             <tree string="Recettes">
                 <field name="exercice_id"/>
+                <field name="code_compte"/>
                 <field name="date_versement"/>
                 <field name="numero_declaration_recette"/>
                 <field name="date_declaration_recette"/>
@@ -97,9 +111,11 @@
                 <field name="numero_ordre_recette"/>
                 <field name="numero_declaration_recette"/>
                 <field name="exercice_id"/>
+                <field name="code_compte"/>
                 <field name="date_versement"/>
                 <field name="date_ordre_recette"/>
                 <filter string="Par exercice" name="group_exercice" context="{'group_by': 'exercice_id'}"/>
+                <filter string="Par compte" name="group_compte" context="{'group_by': 'code_compte'}"/>
             </search>
         </field>
     </record>

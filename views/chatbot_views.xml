@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_chatbot_conversation_tree" model="ir.ui.view">
+        <field name="name">chatbot.conversation.tree</field>
+        <field name="model">chatbot.conversation</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="titre"/>
+                <field name="user_id"/>
+                <field name="message_count"/>
+                <field name="state" widget="badge"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_chatbot_conversation_form" model="ir.ui.view">
+        <field name="name">chatbot.conversation.form</field>
+        <field name="model">chatbot.conversation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_archiver" type="object" string="Archiver"
+                            invisible="state == 'archivee'"/>
+                    <button name="action_reouvrir" type="object" string="Réouvrir"
+                            invisible="state != 'archivee'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="brouillon,en_cours,archivee"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="titre"/>
+                        <field name="user_id"/>
+                        <field name="message_count"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Messages">
+                            <field name="chat_message_ids" readonly="1">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="role"/>
+                                    <field name="content"/>
+                                    <field name="is_error"/>
+                                    <field name="contexte_utilise"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_chatbot_conversation_search" model="ir.ui.view">
+        <field name="name">chatbot.conversation.search</field>
+        <field name="model">chatbot.conversation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="titre"/>
+                <field name="user_id"/>
+                <filter name="en_cours" string="En cours" domain="[('state', '=', 'en_cours')]"/>
+                <filter name="archivee" string="Archivées" domain="[('state', '=', 'archivee')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_user" string="Utilisateur" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_state" string="État" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_chatbot_message_tree" model="ir.ui.view">
+        <field name="name">chatbot.message.tree</field>
+        <field name="model">chatbot.message</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="conversation_id"/>
+                <field name="role"/>
+                <field name="content"/>
+                <field name="is_error"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_chatbot_conversation" model="ir.actions.act_window">
+        <field name="name">Conversations assistant IA</field>
+        <field name="res_model">chatbot.conversation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_chatbot_conversation"
+              name="Conversations assistant IA"
+              action="action_chatbot_conversation"
+              sequence="90"/>
+
+</odoo>

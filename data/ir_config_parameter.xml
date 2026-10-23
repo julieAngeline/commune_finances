@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="param_ollama_url" model="ir.config_parameter">
+            <field name="key">commune_finances.ollama_url</field>
+            <field name="value">http://localhost:11434</field>
+        </record>
+        <record id="param_ollama_model" model="ir.config_parameter">
+            <field name="key">commune_finances.ollama_model</field>
+            <field name="value">llama3.2</field>
+        </record>
+        <record id="param_ollama_timeout" model="ir.config_parameter">
+            <field name="key">commune_finances.ollama_timeout</field>
+            <field name="value">300</field>
+        </record>
+        <record id="param_ollama_num_ctx" model="ir.config_parameter">
+            <field name="key">commune_finances.ollama_num_ctx</field>
+            <field name="value">2048</field>
+        </record>
+        <record id="param_max_tool_rounds" model="ir.config_parameter">
+            <field name="key">commune_finances.max_tool_rounds</field>
+            <field name="value">3</field>
+        </record>
+        <record id="param_chroma_dir" model="ir.config_parameter">
+            <field name="key">commune_finances.chroma_dir</field>
+            <field name="value">/opt/odoo/chroma_db</field>
+        </record>
+        <record id="param_documents_dir" model="ir.config_parameter">
+            <field name="key">commune_finances.documents_dir</field>
+            <field name="value">/opt/odoo/documents</field>
+        </record>
+        <record id="param_rag_collection" model="ir.config_parameter">
+            <field name="key">commune_finances.rag_collection</field>
+            <field name="value">cuf-financial-docs</field>
+        </record>
+        <record id="param_rag_dir" model="ir.config_parameter">
+            <field name="key">commune_finances.rag_dir</field>
+            <field name="value">/opt/odoo/rag_pipeline</field>
+        </record>
+    </data>
+</odoo>

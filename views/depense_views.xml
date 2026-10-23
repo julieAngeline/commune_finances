@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <record id="view_commune_depense_form" model="ir.ui.view">
@@ -15,7 +15,7 @@
                     <group string="Identification">
                         <field name="exercice_id"/>
                         <field name="budget_id" domain="[('exercice_id', '=', exercice_id)]"/>
-                        <field name="compte_id" readonly="1"/>
+                        <field name="code_compte" readonly="1"/>
                     </group>
                       <group col="2">
                      <group>
@@ -54,7 +54,7 @@
 
             <tree>
                 <field name="exercice_id" string="Exercice"/>
-                <field name="compte_id" string="Compte"/>
+                <field name="code_compte" string="Compte"/>
                 <field name="date" string="Date"/>
                 <field name="objet" string="Objet"/>
                 <field name="credit_ouvert" string="Crédit ouvert"/>
